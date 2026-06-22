@@ -29,9 +29,34 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+// Détecte une configuration manquante (clés .env absentes en prod) pour
+// afficher un message clair plutôt qu'un plantage silencieux. Les
+// fonctionnalités hors compte (horaires, Coran, Qibla...) restent
+// utilisables même sans Firebase configuré.
+export const isFirebaseConfigured = Boolean(
+  firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.appId
+);
+
+if (!isFirebaseConfigured && typeof console !== "undefined") {
+  console.warn(
+    "[Waxtubi] Configuration Firebase absente ou incomplète — les fonctionnalités de compte et de sauvegarde cloud (Dhikr, jeûne) seront indisponibles. Vérifie les variables d'environnement VITE_FIREBASE_*."
+  );
+}
+
+let app, auth, db;
+if (isFirebaseConfigured) {
+  app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  db = getFirestore(app);
+} else {
+  // Évite un crash immédiat à l'import : les fonctions qui utilisent
+  // auth/db plus loin vérifient isFirebaseConfigured avant de les appeler.
+  auth = null;
+  db = null;
+}
+
+export { auth, db };
+
 
 /**
  * S'assure qu'un utilisateur (même anonyme) est connecté.
@@ -42,6 +67,9 @@ export const db = getFirestore(app);
  * plus tard via createAccountFromAnonymous.
  */
 export function ensureAnonymousAuth() {
+  if (!isFirebaseConfigured) {
+    return Promise.reject(new Error("Firebase non configuré"));
+  }
   return new Promise((resolve, reject) => {
     const unsub = onAuthStateChanged(
       auth,

@@ -99,8 +99,8 @@ export function useAudioDownloads(reciterIdentifier) {
           return next;
         });
         await refreshDownloadedList();
-      } catch {
-        setError(`Échec sur la sourate ${surahNumber}, arrêt du téléchargement groupé.`);
+      } catch (e) {
+        setError(`Échec sur la sourate ${surahNumber} : ${e.message}. Téléchargement groupé arrêté.`);
         break;
       }
     }

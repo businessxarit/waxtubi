@@ -77,10 +77,18 @@ export const SIRA_TIMELINE = [
 
 /**
  * Fiches biographiques des Sahabas (compagnons) les plus connus.
+ *
+ * Inclut les quatre premiers califes et les « dix promis au Paradis »
+ * (Al-Asharah Al-Mubasharun) selon la liste reconnue dans la tradition
+ * sunnite (hadiths rapportés notamment par At-Tirmidhi et Abu Dawud).
+ *
  * Note de neutralité : le statut respectif des trois premiers califes
  * (Abu Bakr, Umar, Uthman) fait l'objet d'un désaccord de fond entre
- * traditions sunnite et chiite — désaccord non tranché ici. Les fiches
- * se limitent aux faits biographiques largement admis.
+ * traditions sunnite et chiite — désaccord non tranché ici. La liste
+ * des « dix promis au Paradis » elle-même est une tradition propre à
+ * la littérature sunnite ; elle n'est pas reconnue dans la même forme
+ * par la tradition chiite. Les fiches se limitent aux faits
+ * biographiques largement admis.
  */
 export const SAHABA_PROFILES = [
   {
@@ -131,5 +139,47 @@ export const SAHABA_PROFILES = [
     arabic: "بلال بن رباح",
     title: "Premier muezzin de l'islam",
     text: "Ancien esclave affranchi grâce à l'intervention d'Abu Bakr après avoir subi des persécutions pour sa foi. Il devient le premier muezzin (celui qui appelle à la prière) de l'histoire de l'islam.",
+  },
+  {
+    id: "talha",
+    name: "Talha ibn Ubaydullah",
+    arabic: "طلحة بن عبيد الله",
+    title: "Parmi les dix promis au Paradis",
+    text: "Compagnon de la première heure, connu pour sa générosité et son courage au combat, notamment à la bataille de Uhud où il protège le Prophète (ﷺ) au péril de sa vie. Il fait partie du groupe de dix compagnons que la tradition sunnite désigne comme ayant reçu, de la bouche du Prophète, l'annonce du Paradis.",
+  },
+  {
+    id: "zubayr",
+    name: "Az-Zubayr ibn al-Awwam",
+    arabic: "الزبير بن العوام",
+    title: "Parmi les dix promis au Paradis",
+    text: "Cousin et proche compagnon du Prophète (ﷺ), parmi les premiers convertis à l'islam. Connu pour son courage militaire lors de plusieurs batailles. Il fait partie des dix compagnons mentionnés dans la tradition sunnite comme ayant reçu l'annonce du Paradis.",
+  },
+  {
+    id: "abdurrahman",
+    name: "Abd ar-Rahman ibn Awf",
+    arabic: "عبد الرحمن بن عوف",
+    title: "Parmi les dix promis au Paradis",
+    text: "Marchand prospère converti tôt à l'islam, reconnu pour sa générosité envers la communauté naissante de Médine. Il fait partie des dix compagnons mentionnés dans la tradition sunnite comme ayant reçu l'annonce du Paradis.",
+  },
+  {
+    id: "saad",
+    name: "Sa'd ibn Abi Waqqas",
+    arabic: "سعد بن أبي وقاص",
+    title: "Parmi les dix promis au Paradis",
+    text: "Un des premiers convertis à l'islam, connu pour son rôle militaire, notamment lors des grandes expansions sous le califat d'Umar. Il fait partie des dix compagnons mentionnés dans la tradition sunnite comme ayant reçu l'annonce du Paradis.",
+  },
+  {
+    id: "saidibnzayd",
+    name: "Sa'id ibn Zayd",
+    arabic: "سعيد بن زيد",
+    title: "Parmi les dix promis au Paradis",
+    text: "Compagnon de la première heure, cousin d'Umar ibn al-Khattab. Bien qu'il n'ait pas occupé de fonction politique de premier plan, il est tenu en haute estime pour son ancienneté dans la foi. Il fait partie des dix compagnons mentionnés dans la tradition sunnite comme ayant reçu l'annonce du Paradis.",
+  },
+  {
+    id: "abuubaydah",
+    name: "Abu Ubaydah ibn al-Jarrah",
+    arabic: "أبو عبيدة بن الجراح",
+    title: "Parmi les dix promis au Paradis",
+    text: "Compagnon respecté pour sa droiture, surnommé par certains récits « l'homme de confiance de cette communauté ». Il joue un rôle notable lors des grandes expansions militaires sous les premiers califes. Il fait partie des dix compagnons mentionnés dans la tradition sunnite comme ayant reçu l'annonce du Paradis.",
   },
 ];

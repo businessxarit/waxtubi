@@ -1,10 +1,10 @@
 .app-topbar {
   position: fixed;
-  top: var(--space-4);
+  top: calc(env(safe-area-inset-top, 0px) + var(--space-3));
   right: var(--space-4);
   z-index: 40;
 }
 
 main {
-  padding-top: var(--space-7);
+  padding-top: calc(env(safe-area-inset-top, 0px) + 64px);
 }

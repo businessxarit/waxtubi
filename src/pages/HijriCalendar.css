@@ -7,6 +7,7 @@
 .hijri-header {
   text-align: center;
   margin-bottom: var(--space-6);
+  position: relative;
 }
 
 .hijri-title {
@@ -27,6 +28,7 @@
 }
 
 .hijri-month-card {
+  width: 100%;
   background: var(--ink-soft);
   border: 1px solid var(--ink-raised);
   border-radius: var(--radius-md);
@@ -36,6 +38,7 @@
   align-items: center;
   text-align: center;
   gap: var(--space-2);
+  font-family: inherit;
 }
 
 .hijri-month-card.is-current {
@@ -65,4 +68,248 @@
   .hijri-month-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+}
+
+/* --- Jours Blancs --- */
+.white-days-section {
+  margin-top: var(--space-7);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--ink-raised);
+}
+
+.white-days-title {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--sand);
+  margin: 0 0 var(--space-2);
+  text-align: center;
+}
+
+.white-days-subtitle {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--sand-dim);
+  text-align: center;
+  margin: 0 0 var(--space-5);
+}
+
+.hijri-status {
+  text-align: center;
+  color: var(--sand-dim);
+  font-family: var(--font-body);
+  padding: var(--space-3) 0;
+}
+
+.hijri-error {
+  color: var(--danger);
+}
+
+.white-days-list {
+  list-style: none;
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  border-top: 1px solid var(--ink-raised);
+}
+
+.white-day-row {
+  display: flex;
+  align-items: center;
+  padding: var(--space-3) var(--space-1);
+  border-bottom: 1px solid var(--ink-raised);
+}
+
+.white-day-row.is-today {
+  background: linear-gradient(90deg, rgba(201, 125, 60, 0.14), transparent);
+}
+
+.white-day-hijri {
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--sand);
+  flex-shrink: 0;
+  width: 140px;
+}
+
+.white-day-row.is-today .white-day-hijri {
+  color: var(--copper-bright);
+  font-weight: 600;
+}
+
+.white-day-tick {
+  flex: 1;
+  height: 1px;
+  background: repeating-linear-gradient(
+    to right,
+    var(--brass) 0,
+    var(--brass) 3px,
+    transparent 3px,
+    transparent 9px
+  );
+  opacity: 0.4;
+}
+
+.white-day-gregorian {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--sand-dim);
+  flex-shrink: 0;
+  margin-left: var(--space-3);
+}
+
+.white-days-source-note {
+  font-family: var(--font-body);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--sand-dim);
+  font-style: italic;
+  text-align: center;
+  margin: 0;
+}
+
+/* --- Vue année groupée par mois --- */
+.white-days-year-list {
+  list-style: none;
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.white-days-month-block {
+  background: var(--ink-soft);
+  border: 1px solid var(--ink-raised);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.white-days-month-block.is-current-month {
+  border-color: var(--copper);
+}
+
+.white-days-month-header {
+  width: 100%;
+  background: var(--ink-raised);
+  border: none;
+  text-align: left;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--sand);
+}
+
+.white-days-month-block.is-current-month .white-days-month-header {
+  color: var(--copper-bright);
+}
+
+.white-days-month-block .white-days-list {
+  border-top: none;
+  margin-bottom: 0;
+}
+
+.white-days-month-block .white-day-row:last-child {
+  border-bottom: none;
+}
+
+/* --- Retour depuis la vue détaillée --- */
+.month-detail-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: none;
+  border: none;
+  color: var(--sand-dim);
+  font-family: var(--font-body);
+  font-size: 13px;
+}
+
+/* --- Vue détaillée jour par jour --- */
+.month-day-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--ink-raised);
+}
+
+.month-day-row {
+  display: flex;
+  align-items: center;
+  padding: var(--space-3) var(--space-1);
+  border-bottom: 1px solid var(--ink-raised);
+}
+
+.month-day-row.is-today {
+  background: linear-gradient(90deg, rgba(201, 125, 60, 0.14), transparent);
+}
+
+.month-day-row.is-white-day {
+  background: linear-gradient(90deg, rgba(212, 175, 106, 0.1), transparent);
+}
+
+.month-day-hijri {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  color: var(--brass);
+  flex-shrink: 0;
+  width: 28px;
+  text-align: center;
+}
+
+.month-day-row.is-today .month-day-hijri {
+  color: var(--copper-bright);
+  font-weight: 700;
+}
+
+.month-day-tick {
+  flex: 1;
+  height: 1px;
+  background: repeating-linear-gradient(
+    to right,
+    var(--ink-raised) 0,
+    var(--ink-raised) 3px,
+    transparent 3px,
+    transparent 9px
+  );
+  margin: 0 var(--space-3);
+}
+
+.month-day-gregorian {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--sand-dim);
+  flex-shrink: 0;
+}
+
+.month-day-row.is-today .month-day-gregorian {
+  color: var(--sand);
+}
+
+.month-day-badge {
+  flex-shrink: 0;
+  margin-left: var(--space-2);
+  font-size: 13px;
+}
+
+.fasting-check-btn {
+  flex-shrink: 0;
+  margin-left: var(--space-3);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--ink-raised);
+  background: none;
+  color: var(--sand-dim);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fasting-check-btn.is-fasted {
+  border-color: var(--sage);
+  background: var(--sage);
+  color: var(--ink);
 }

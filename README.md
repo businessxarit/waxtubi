@@ -87,6 +87,84 @@ disponibles, le karaoke est un mode optionnel en plus.
 - Toutes les animations respectent `prefers-reduced-motion` (désactivées
   automatiquement si l'utilisateur a ce réglage actif sur son téléphone)
 
+## Duas du quotidien
+
+Accessible via le bouton 🤲 dans Dhikr. 7 catégories (réveil, sommeil,
+repas, maison, voyage, matin, soir), chacune avec arabe, transliteration,
+traduction et source. Invocations largement attestées dans les recueils
+de hadiths authentiques (Bukhari, Muslim, Abu Dawud, At-Tirmidhi) —
+texte arabe reproduit tel quel (source religieuse, pas une œuvre sous
+droit d'auteur), traductions rédigées pour Waxtubi.
+
+## Suivi de jeûne
+
+Dans la vue détaillée d'un mois (Calendrier), chaque jour a un bouton
+cocher (○ / ✓) pour marquer s'il a été jeûné. Stocké en local (fonctionne
+sans compte) et synchronisé vers Firestore si un compte réel est connecté.
+
+## Recherche par mot-clé dans le Coran
+
+Nouveau champ de recherche (🔍) distinct du filtre par nom de sourate,
+dans la page Coran. Cherche un mot dans tout le texte (langue FR/EN
+sélectionnée), via l'endpoint `/search` de l'API. Debounce de 500ms pour
+éviter un appel à chaque frappe. Toucher un résultat ouvre la sourate
+correspondante.
+
+## Notifications de prière
+
+Bouton "🔕 Activer les rappels" dans la page Accueil. Limite importante
+à connaître : ce sont des **notifications locales** (API Notification du
+navigateur), pas un vrai push serveur — elles ne se déclenchent que si
+l'app/onglet a été ouvert récemment (le navigateur garde le timer actif
+un certain temps). Sur iOS, nécessite que la PWA soit installée sur
+l'écran d'accueil. Un vrai système de push serveur nécessiterait un
+backend dédié, hors de la portée actuelle du projet.
+
+## Robustesse technique
+
+- **Configuration Firebase manquante** : si les variables d'environnement
+  `VITE_FIREBASE_*` sont absentes en prod, l'app affiche un avertissement
+  clair en console au lieu de planter silencieusement. Les fonctionnalités
+  hors compte (horaires, Coran, Qibla, calendrier) restent utilisables.
+- **Code splitting** : les pages Coran, Dhikr, Qibla, Calendrier et Sira
+  sont chargées à la demande (lazy loading) plutôt qu'au démarrage,
+  pour réduire le temps de premier chargement sur réseau mobile.
+
+## Calendrier — année complète & vue détaillée par mois
+
+**Vue année** : la page Calendrier affiche maintenant les Jours Blancs
+des 12 mois de l'année hijri en cours (pas seulement le mois courant),
+regroupés par mois, avec leurs dates grégoriennes correspondantes —
+calculées en direct via l'API, pas codées en dur.
+
+**Vue détaillée par mois** : toucher un mois (dans la grille du haut ou
+dans la liste des Jours Blancs) ouvre une vue jour par jour de ce mois,
+avec :
+- Chaque jour hijri et sa date grégorienne correspondante
+- Le jour du mois en cours surligné (cuivre)
+- Les 3 Jours Blancs du mois marqués d'un repère 🌕
+- Récupéré en un seul appel API (`hToGCalendar`) plutôt que jour par jour
+
+## Jours Blancs (Ayyam al-Bid)
+
+Section ajoutée dans la page Calendrier : les 13, 14 et 15 de chaque mois
+hijri (nuits de pleine lune), traditionnellement recommandées au jeûne —
+le Prophète ﷺ ne les délaissait jamais, en voyage comme à demeure
+(hadith rapporté par Ibn Abbas, Sunan an-Nasa'i n°2422).
+
+Les dates exactes du mois en cours sont calculées en direct via l'API
+Aladhan (conversion hijri → grégorien), pas codées en dur — donc
+toujours justes même si le mois hijri change. Le jour du mois en cours
+est surligné s'il correspond à l'un des trois.
+
+## Correction : échec du téléchargement groupé
+
+Le téléchargement audio groupé ("Tout télécharger") affichait un message
+d'erreur générique sans indiquer la vraie cause. Le code remonte
+maintenant le message d'erreur réel (réseau, code HTTP, restriction
+d'accès) pour permettre un diagnostic précis si le problème persiste sur
+certains réseaux ou navigateurs.
+
 ## Onglet Sira (vie du Prophète & Sahabas)
 
 Nouvel onglet "Sira" avec deux sections :

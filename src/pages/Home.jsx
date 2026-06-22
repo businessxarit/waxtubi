@@ -1,4 +1,5 @@
 import { usePrayerTimes } from "../hooks/usePrayerTimes";
+import { usePrayerNotifications } from "../hooks/usePrayerNotifications";
 import GraduatedArc from "../components/GraduatedArc";
 import "./Home.css";
 
@@ -13,6 +14,7 @@ function formatCountdown(minutes) {
 
 export default function Home() {
   const { data, next, geoStatus, error, loading, position } = usePrayerTimes();
+  const notifications = usePrayerNotifications(data?.timings);
 
   return (
     <div className="home-page">
@@ -28,6 +30,20 @@ export default function Home() {
           <p className="home-date">
             {data.gregorian.day} {data.gregorian.month.en} {data.gregorian.year} ·{" "}
             {data.hijri.day} {data.hijri.month.en} {data.hijri.year}h
+          </p>
+        )}
+
+        {notifications.supported && (
+          <button
+            className={`notif-toggle ${notifications.enabled ? "is-active" : ""}`}
+            onClick={() => notifications.setEnabled(!notifications.enabled)}
+          >
+            {notifications.enabled ? "🔔 Rappels activés" : "🔕 Activer les rappels de prière"}
+          </button>
+        )}
+        {notifications.permission === "denied" && (
+          <p className="notif-denied-note">
+            Notifications bloquées — autorise-les dans les réglages de ton navigateur pour recevoir les rappels.
           </p>
         )}
       </header>

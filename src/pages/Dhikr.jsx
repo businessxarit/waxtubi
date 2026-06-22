@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import PrayerBeads from "../components/PrayerBeads";
 import AccountPanel from "../components/AccountPanel";
+import Duas from "./Duas";
 import { useBeadSound } from "../hooks/useBeadSound";
 import { useSpeech } from "../hooks/useSpeech";
 import { useAuth } from "../hooks/useAuth";
@@ -18,6 +19,7 @@ export default function Dhikr() {
   const [showSoundPanel, setShowSoundPanel] = useState(false);
   const [showAccountPanel, setShowAccountPanel] = useState(false);
   const [showNamesPanel, setShowNamesPanel] = useState(false);
+  const [showDuas, setShowDuas] = useState(false);
   const { prefs, play, setEnabled, setVariant, setVolume } = useBeadSound();
   const saveTimeoutRef = useRef(null);
 
@@ -54,6 +56,11 @@ export default function Dhikr() {
     setShowAccountPanel(panel === "account" ? (s) => !s : false);
     setShowSoundPanel(panel === "sound" ? (s) => !s : false);
     setShowNamesPanel(panel === "names" ? (s) => !s : false);
+    setShowDuas(panel === "duas" ? (s) => !s : false);
+  }
+
+  if (showDuas) {
+    return <Duas onBack={() => setShowDuas(false)} />;
   }
 
   return (
@@ -62,6 +69,9 @@ export default function Dhikr() {
         <span className="home-eyebrow">Dhikr</span>
         <h1 className="dhikr-title">Compteur</h1>
         <div className="dhikr-header-actions">
+          <button className="dhikr-icon-btn" onClick={() => togglePanel("duas")} aria-label="Duas du quotidien">
+            🤲
+          </button>
           <button className="dhikr-icon-btn" onClick={() => togglePanel("names")} aria-label="Les 99 Noms d'Allah">
             📿
           </button>

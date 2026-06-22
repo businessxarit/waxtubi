@@ -34,8 +34,21 @@ function storageKey(reciterIdentifier, surahNumber) {
  * @param {(receivedBytes: number, totalBytes: number) => void} onProgress
  */
 export async function downloadSurahAudio(url, reciterIdentifier, surahNumber, onProgress) {
-  const res = await fetch(url);
-  if (!res.ok || !res.body) throw new Error("Téléchargement audio impossible");
+  let res;
+  try {
+    res = await fetch(url, { mode: "cors" });
+  } catch {
+    // Échec réseau pur (hors-ligne, ou requête bloquée avant même la
+    // réponse — souvent un signe de restriction CORS côté serveur).
+    throw new Error("Connexion au serveur audio impossible (réseau ou restriction d'accès)");
+  }
+
+  if (!res.ok) {
+    throw new Error(`Le serveur audio a répondu une erreur (code ${res.status})`);
+  }
+  if (!res.body) {
+    throw new Error("Réponse audio invalide (flux vide)");
+  }
 
   const totalBytes = Number(res.headers.get("content-length")) || 0;
   const reader = res.body.getReader();

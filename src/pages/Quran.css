@@ -89,10 +89,64 @@
   color: var(--sand);
   font-family: var(--font-body);
   font-size: 15px;
+  margin-bottom: var(--space-3);
+  box-sizing: border-box;
 }
 
 .quran-search::placeholder {
   color: var(--sand-dim);
+}
+
+.quran-content-search {
+  width: 100%;
+  background: var(--ink-soft);
+  border: 1px solid var(--copper);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  color: var(--sand);
+  font-family: var(--font-body);
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.quran-content-search::placeholder {
+  color: var(--sand-dim);
+}
+
+.content-search-results {
+  margin-bottom: var(--space-5);
+}
+
+.content-result-list {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  border-top: 1px solid var(--ink-raised);
+}
+
+.content-result-row {
+  width: 100%;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--ink-raised);
+  padding: var(--space-3) var(--space-2);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.content-result-ref {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--copper-bright);
+}
+
+.content-result-text {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--sand);
 }
 
 .quran-status {
@@ -104,6 +158,14 @@
 
 .quran-error {
   color: var(--danger);
+  background: var(--ink-soft);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 /* --- Liste des sourates --- */

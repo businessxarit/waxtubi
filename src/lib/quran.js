@@ -67,6 +67,32 @@ export async function fetchAvailableReciters() {
 }
 
 /**
+ * Recherche un mot-clé dans tout le Coran, pour une langue donnée
+ * (traduction résolue dynamiquement comme pour la lecture normale).
+ * Retourne les versets correspondants avec leur sourate d'origine.
+ */
+export async function searchQuran(keyword, langCode) {
+  if (!keyword || keyword.trim().length < 2) return [];
+  const translationEdition = await resolveTranslationEdition(langCode);
+  const res = await fetch(
+    `${BASE}/search/${encodeURIComponent(keyword.trim())}/all/${translationEdition}`
+  );
+  if (!res.ok) {
+    if (res.status === 404) return []; // aucun résultat, pas une erreur
+    throw new Error("Recherche indisponible pour le moment");
+  }
+  const json = await res.json();
+  const matches = json.data?.matches ?? [];
+  return matches.map((m) => ({
+    surahNumber: m.surah.number,
+    surahName: m.surah.englishName,
+    ayahNumber: m.numberInSurah,
+    globalNumber: m.number,
+    text: m.text,
+  }));
+}
+
+/**
  * Construit l'URL de streaming pour une sourate donnée et un récitateur.
  * Utilise le CDN officiel islamic.network, bitrate 128kbps (bon compromis qualité/poids).
  */

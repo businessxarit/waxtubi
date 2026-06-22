@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { fetchSurahList, fetchSurah, fetchAvailableReciters, getSurahAudioUrl, TRANSLATION_LANGUAGES } from "../lib/quran";
+import { fetchSurahList, fetchSurah, fetchAvailableReciters, getSurahAudioUrl, searchQuran, TRANSLATION_LANGUAGES } from "../lib/quran";
 import { useAudioDownloads } from "../hooks/useAudioDownloads";
 import { useArabicFont } from "../hooks/useArabicFont";
 import { useAyahByAyahPlayback } from "../hooks/useAyahByAyahPlayback";
@@ -10,12 +10,17 @@ import "./Quran.css";
 
 const LANG_STORAGE_KEY = "waxtubi:quran:lang";
 const RECITER_STORAGE_KEY = "waxtubi:quran:reciter";
+const SEARCH_DEBOUNCE_MS = 500;
 
 export default function Quran() {
   const [surahList, setSurahList] = useState(null);
   const [listError, setListError] = useState(null);
   const [activeSurahNumber, setActiveSurahNumber] = useState(null);
   const [search, setSearch] = useState("");
+  const [contentQuery, setContentQuery] = useState("");
+  const [contentResults, setContentResults] = useState(null);
+  const [contentSearchError, setContentSearchError] = useState(null);
+  const [resolvedQueryKey, setResolvedQueryKey] = useState(null);
   const [lang, setLang] = useState(
     () => localStorage.getItem(LANG_STORAGE_KEY) || "fr"
   );
@@ -46,6 +51,31 @@ export default function Quran() {
       })
       .catch((e) => setRecitersError(e.message));
   }, []);
+
+  // Recherche par contenu (mot-clé dans le texte), distincte du filtre
+  // par nom de sourate. Debounce pour éviter un appel à chaque frappe.
+  // "loading" est dérivé (clé de requête résolue ≠ clé courante) plutôt
+  // que mis à jour directement dans l'effet.
+  const currentQueryKey = `${contentQuery.trim()}:${lang}`;
+  const contentSearchLoading =
+    contentQuery.trim().length >= 2 && resolvedQueryKey !== currentQueryKey && !contentSearchError;
+
+  useEffect(() => {
+    if (!contentQuery || contentQuery.trim().length < 2) return;
+
+    const queryKey = `${contentQuery.trim()}:${lang}`;
+    const timeoutId = setTimeout(() => {
+      searchQuran(contentQuery, lang)
+        .then((results) => {
+          setContentResults(results);
+          setContentSearchError(null);
+        })
+        .catch((e) => setContentSearchError(e.message))
+        .finally(() => setResolvedQueryKey(queryKey));
+    }, SEARCH_DEBOUNCE_MS);
+
+    return () => clearTimeout(timeoutId);
+  }, [contentQuery, lang]);
 
   useEffect(() => {
     if (selectedReciter) localStorage.setItem(RECITER_STORAGE_KEY, selectedReciter);
@@ -119,7 +149,44 @@ export default function Quran() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+
+        <input
+          className="quran-content-search"
+          type="text"
+          inputMode="search"
+          placeholder="🔍 Rechercher un mot dans le texte du Coran…"
+          value={contentQuery}
+          onChange={(e) => setContentQuery(e.target.value)}
+        />
       </header>
+
+      {contentQuery.trim().length >= 2 && (
+        <section className="content-search-results">
+          {contentSearchLoading && <p className="quran-status">Recherche…</p>}
+          {contentSearchError && <p className="quran-status quran-error">{contentSearchError}</p>}
+          {contentResults && contentResults.length === 0 && !contentSearchLoading && (
+            <p className="quran-status">Aucun verset ne contient « {contentQuery} ».</p>
+          )}
+          {contentResults && contentResults.length > 0 && (
+            <ul className="content-result-list">
+              {contentResults.map((r) => (
+                <li key={r.globalNumber}>
+                  <button
+                    className="content-result-row"
+                    onClick={() => {
+                      setActiveSurahNumber(r.surahNumber);
+                      setContentQuery("");
+                    }}
+                  >
+                    <span className="content-result-ref">{r.surahName} · {r.ayahNumber}</span>
+                    <span className="content-result-text">{r.text}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
 
       {reciters && reciters.length > 0 && (
         <div className="download-bar">
@@ -163,33 +230,35 @@ export default function Quran() {
         <p className="quran-status">Chargement des sourates…</p>
       )}
 
-      <ul className="surah-list">
-        {filteredList.map((s) => {
-          const isDownloaded = downloads.downloadedSet.has(s.number);
-          const progress = downloads.progress[s.number];
-          return (
-            <li key={s.number}>
-              <button
-                className="surah-row"
-                onClick={() => setActiveSurahNumber(s.number)}
-              >
-                <span className="surah-number">{s.number}</span>
-                <span className="surah-names">
-                  <span className="surah-english">{s.englishName}</span>
-                  <span className="surah-translation">{s.englishNameTranslation}</span>
-                </span>
-                {progress && (
-                  <span className="surah-download-progress">
-                    {Math.round((progress.received / (progress.total || progress.received || 1)) * 100)}%
+      {contentQuery.trim().length < 2 && (
+        <ul className="surah-list">
+          {filteredList.map((s) => {
+            const isDownloaded = downloads.downloadedSet.has(s.number);
+            const progress = downloads.progress[s.number];
+            return (
+              <li key={s.number}>
+                <button
+                  className="surah-row"
+                  onClick={() => setActiveSurahNumber(s.number)}
+                >
+                  <span className="surah-number">{s.number}</span>
+                  <span className="surah-names">
+                    <span className="surah-english">{s.englishName}</span>
+                    <span className="surah-translation">{s.englishNameTranslation}</span>
                   </span>
-                )}
-                {!progress && isDownloaded && <span className="surah-downloaded-badge">⬇</span>}
-                <span className="surah-arabic" lang="ar" dir="rtl">{s.name}</span>
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+                  {progress && (
+                    <span className="surah-download-progress">
+                      {Math.round((progress.received / (progress.total || progress.received || 1)) * 100)}%
+                    </span>
+                  )}
+                  {!progress && isDownloaded && <span className="surah-downloaded-badge">⬇</span>}
+                  <span className="surah-arabic" lang="ar" dir="rtl">{s.name}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
 
       {surahList && filteredList.length === 0 && (
         <p className="quran-status">Aucune sourate ne correspond à « {search} ».</p>
