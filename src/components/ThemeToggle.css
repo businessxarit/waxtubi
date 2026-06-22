@@ -1,0 +1,34 @@
+.theme-toggle {
+  display: inline-flex;
+  gap: 2px;
+  background: var(--ink-soft);
+  border: 1px solid var(--ink-raised);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+}
+
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  color: var(--sand-dim);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.theme-toggle-btn.is-active {
+  background: var(--copper);
+  color: var(--ink);
+}
+
+@media (max-width: 360px) {
+  .theme-toggle-btn span:last-child {
+    display: none;
+  }
+}

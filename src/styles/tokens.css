@@ -1,0 +1,141 @@
+/* ===========================================================
+   WAXTUBI — Design tokens
+   Inspiré des instruments traditionnels de mesure du temps :
+   astrolabe, cadran solaire, graduations de laiton.
+
+   Thème géré via l'attribut [data-theme] sur <html> :
+   - data-theme="dark"  → palette sombre (sapin / cuivre)
+   - data-theme="light" → palette claire (sable / cuivre sourd)
+   Si aucun attribut n'est posé (mode "auto"), on suit
+   prefers-color-scheme du système.
+   =========================================================== */
+
+:root {
+  /* --- Typo (identique dans les deux thèmes) --- */
+  --font-display: "Fraunces", "Georgia", serif;
+  --font-body: "Inter", -apple-system, sans-serif;
+  --font-mono: "Space Mono", monospace;
+  --font-arabic: "Amiri", serif;
+
+  /* --- Échelle --- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+}
+
+/* ---------- Thème sombre (par défaut) ---------- */
+:root,
+[data-theme="dark"] {
+  --ink: #1C2B2D;
+  --ink-soft: #25393C;
+  --ink-raised: #2E454A;
+  --sand: #E8E1D3;
+  --sand-dim: #B9B2A2;
+  --copper: #C97D3C;
+  --copper-bright: #E0954F;
+  --sage: #7A9B8E;
+  --brass: #D4AF6A;
+  --danger: #C2554A;
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.28);
+  --shadow-raised: 0 2px 8px rgba(0, 0, 0, 0.2);
+  color-scheme: dark;
+}
+
+/* ---------- Thème clair ---------- */
+[data-theme="light"] {
+  --ink: #F4EFE4;          /* fond — sable chaud type parchemin */
+  --ink-soft: #EAE2D1;     /* cartes / surfaces légèrement creusées */
+  --ink-raised: #DDD2B8;   /* surfaces élevées, bordures, hover */
+  --sand: #2A2420;         /* texte principal — brun très sombre */
+  --sand-dim: #8A7F6B;     /* texte secondaire */
+  --copper: #B8682E;       /* accent, un peu plus saturé pour rester lisible */
+  --copper-bright: #9C5424;
+  --sage: #5F7D70;
+  --brass: #A8823F;        /* graduations — plus sombre que la version nuit */
+  --danger: #B33B30;
+  --shadow-card: 0 4px 20px rgba(42, 36, 32, 0.12);
+  --shadow-raised: 0 2px 6px rgba(42, 36, 32, 0.08);
+  color-scheme: light;
+}
+
+/* ---------- Mode auto : suit le système si pas d'override ---------- */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]):not([data-theme="light"]) {
+    --ink: #F4EFE4;
+    --ink-soft: #EAE2D1;
+    --ink-raised: #DDD2B8;
+    --sand: #2A2420;
+    --sand-dim: #8A7F6B;
+    --copper: #B8682E;
+    --copper-bright: #9C5424;
+    --sage: #5F7D70;
+    --brass: #A8823F;
+    --danger: #B33B30;
+    --shadow-card: 0 4px 20px rgba(42, 36, 32, 0.12);
+    --shadow-raised: 0 2px 6px rgba(42, 36, 32, 0.08);
+    color-scheme: light;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--ink);
+  color: var(--sand);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: var(--copper);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--copper-bright);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Scrollbar discret */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: var(--ink-raised); border-radius: 4px; }
+::-webkit-scrollbar-track { background: transparent; }

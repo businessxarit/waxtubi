@@ -1,0 +1,143 @@
+.home-fade-in {
+  opacity: 0;
+  animation: home-fade-up 0.55s ease-out forwards;
+}
+
+@keyframes home-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.home-stagger-in {
+  opacity: 0;
+  animation: home-fade-up 0.45s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-fade-in,
+  .home-stagger-in {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+.home-page {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5) var(--space-8);
+}
+
+.home-header {
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+.home-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sage);
+}
+
+.home-city {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 500;
+  margin: var(--space-2) 0 var(--space-1);
+  color: var(--sand);
+}
+
+.home-geo-note {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--sand-dim);
+}
+
+.home-date {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--sand-dim);
+  margin: 0;
+}
+
+.home-arc-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-7);
+}
+
+.home-status {
+  font-family: var(--font-body);
+  color: var(--sand-dim);
+  text-align: center;
+}
+
+.home-error {
+  color: var(--danger);
+}
+
+.home-timings-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--ink-raised);
+}
+
+.timing-row {
+  display: flex;
+  align-items: center;
+  padding: var(--space-4) var(--space-1);
+  border-bottom: 1px solid var(--ink-raised);
+  transition: background 0.2s;
+}
+
+.timing-row.is-next {
+  background: linear-gradient(90deg, rgba(201, 125, 60, 0.12), transparent);
+}
+
+.timing-label {
+  font-family: var(--font-display);
+  font-size: 17px;
+  color: var(--sand);
+  width: 110px;
+  flex-shrink: 0;
+}
+
+.timing-row.is-next .timing-label {
+  color: var(--copper-bright);
+  font-weight: 600;
+}
+
+.timing-tick {
+  flex: 1;
+  height: 1px;
+  background: repeating-linear-gradient(
+    to right,
+    var(--brass) 0,
+    var(--brass) 3px,
+    transparent 3px,
+    transparent 9px
+  );
+  opacity: 0.4;
+}
+
+.timing-time {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  color: var(--sand-dim);
+  flex-shrink: 0;
+  margin-left: var(--space-3);
+}
+
+.timing-row.is-next .timing-time {
+  color: var(--sand);
+  font-weight: 700;
+}

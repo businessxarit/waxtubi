@@ -1,0 +1,168 @@
+.sira-page {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5) var(--space-8);
+}
+
+.sira-header {
+  text-align: center;
+  margin-bottom: var(--space-5);
+}
+
+.sira-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--sand);
+  margin: var(--space-2) 0 var(--space-4);
+}
+
+.sira-tab-switch {
+  display: flex;
+  gap: 4px;
+  background: var(--ink-soft);
+  border: 1px solid var(--ink-raised);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.sira-tab-switch button {
+  background: none;
+  border: none;
+  color: var(--sand-dim);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  padding: var(--space-2) var(--space-4);
+  border-radius: 6px;
+}
+
+.sira-tab-switch button.is-active {
+  background: var(--copper);
+  color: var(--ink);
+}
+
+/* --- Chronologie --- */
+.sira-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-left: 2px solid var(--ink-raised);
+  margin-left: 6px;
+}
+
+.sira-event {
+  position: relative;
+  padding: 0 0 var(--space-6) var(--space-5);
+}
+
+.sira-event::before {
+  content: "";
+  position: absolute;
+  left: -7px;
+  top: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--copper);
+  border: 2px solid var(--ink);
+}
+
+.sira-event-year {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--copper-bright);
+  margin-bottom: var(--space-1);
+}
+
+.sira-event-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--sand);
+  margin: 0 0 var(--space-2);
+}
+
+.sira-event-text {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--sand-dim);
+  margin: 0;
+}
+
+/* --- Fiches Sahabas --- */
+.sahaba-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sahaba-card {
+  background: var(--ink-soft);
+  border: 1px solid var(--ink-raised);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.sahaba-card-header {
+  width: 100%;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  text-align: left;
+}
+
+.sahaba-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.sahaba-name {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--sand);
+}
+
+.sahaba-role {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--copper-bright);
+}
+
+.sahaba-arabic {
+  font-family: var(--font-arabic);
+  font-size: 18px;
+  color: var(--sand-dim);
+  flex-shrink: 0;
+}
+
+.sahaba-text {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--sand-dim);
+  padding: 0 var(--space-4) var(--space-4);
+  margin: 0;
+}
+
+.sira-source-note {
+  font-family: var(--font-body);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--sand-dim);
+  font-style: italic;
+  text-align: center;
+  margin: var(--space-5) 0 0;
+}
