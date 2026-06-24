@@ -108,6 +108,27 @@ Deux bugs liés à l'audio résolus :
    l'afficher dans le sélecteur — les récitateurs cassés sont retirés
    silencieusement plutôt que de planter à l'usage.
 
+## Verset du jour, suivi de prière & transcription phonétique
+
+**Verset du jour** (page Accueil) : un verset différent chaque jour,
+choisi de façon stable (même verset toute la journée, change le
+lendemain) parmi un pool de versets courts et connus. Texte arabe et
+traduction récupérés en direct via l'API — rien n'est codé en dur à
+part les références (sourate:verset).
+
+**Suivi de prière** (page Accueil) : compteur "X/5 prières accomplies
+aujourd'hui" avec cocher (○/✓) sur chacune des 5 prières dans la liste
+des horaires. Stocké en local, synchronisé vers Firestore si un compte
+réel est connecté — même fonctionnement que le suivi de jeûne.
+
+**Transcription phonétique** (page Coran) : chaque verset affiche
+maintenant une ligne de transcription latine sous le texte arabe.
+Important : c'est une approximation phonétique simple (lettre par
+lettre), pas une translittération savante — elle aide à la lecture
+pour quelqu'un qui débute, mais ne remplace pas l'apprentissage de
+l'arabe. Générée par un algorithme de correspondance caractère/son
+écrit pour Waxtubi, sans dépendre d'une API externe supplémentaire.
+
 ## Objectif de Dhikr personnalisé
 
 Bouton 🎯 dans Dhikr : permet de fixer un nombre précis (ex. 1111, 313,

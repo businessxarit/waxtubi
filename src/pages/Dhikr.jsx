@@ -2,11 +2,14 @@ import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import PrayerBeads from "../components/PrayerBeads";
 import AccountPanel from "../components/AccountPanel";
 import Duas from "./Duas";
+import Stats from "./Stats";
 import { useBeadSound } from "../hooks/useBeadSound";
 import { useSpeech } from "../hooks/useSpeech";
 import { useAuth } from "../hooks/useAuth";
 import { fetchDhikrCount, saveDhikrCount } from "../lib/dhikrSync";
 import { fetchAsmaAlHusna } from "../lib/asmaAlHusna";
+import { recordDhikrToday } from "../lib/personalStats";
+import { StatsIcon, TargetIcon, DuaIcon, BeadsCircleIcon, AccountIcon, SoundIcon } from "../components/DhikrIcons";
 import "./Dhikr.css";
 
 const CYCLE_LENGTH = 33; // cycle traditionnel du tasbih, utilisé tant qu'aucun objectif n'est fixé
@@ -21,6 +24,7 @@ export default function Dhikr() {
   const [showAccountPanel, setShowAccountPanel] = useState(false);
   const [showNamesPanel, setShowNamesPanel] = useState(false);
   const [showDuas, setShowDuas] = useState(false);
+  const [showStats, setShowStats] = useState(false);
   const [showGoalPanel, setShowGoalPanel] = useState(false);
   const [goal, setGoal] = useState(() => {
     const saved = localStorage.getItem(GOAL_STORAGE_KEY);
@@ -61,6 +65,7 @@ export default function Dhikr() {
     // supplémentaires ne font plus rien (pas de son ni d'incrément).
     if (goal && count >= goal) return;
     setCount((c) => c + 1);
+    recordDhikrToday(1);
     play();
   }, [play, goal, count]);
 
@@ -99,26 +104,33 @@ export default function Dhikr() {
     return <Duas onBack={() => setShowDuas(false)} />;
   }
 
+  if (showStats) {
+    return <Stats onBack={() => setShowStats(false)} />;
+  }
+
   return (
     <div className="dhikr-page">
       <header className="dhikr-header">
         <span className="home-eyebrow">Dhikr</span>
         <h1 className="dhikr-title">Compteur</h1>
         <div className="dhikr-header-actions">
+          <button className="dhikr-icon-btn" onClick={() => setShowStats(true)} aria-label="Mes statistiques">
+            <StatsIcon />
+          </button>
           <button className="dhikr-icon-btn" onClick={() => togglePanel("goal")} aria-label="Définir un objectif">
-            🎯
+            <TargetIcon active={showGoalPanel} />
           </button>
           <button className="dhikr-icon-btn" onClick={() => togglePanel("duas")} aria-label="Duas du quotidien">
-            🤲
+            <DuaIcon active={showDuas} />
           </button>
           <button className="dhikr-icon-btn" onClick={() => togglePanel("names")} aria-label="Les 99 Noms d'Allah">
-            📿
+            <BeadsCircleIcon active={showNamesPanel} />
           </button>
           <button className="dhikr-icon-btn" onClick={() => togglePanel("account")} aria-label="Compte">
-            {hasRealAccount ? "👤" : "☁️"}
+            <AccountIcon active={showAccountPanel} hasRealAccount={hasRealAccount} />
           </button>
           <button className="dhikr-icon-btn" onClick={() => togglePanel("sound")} aria-label="Réglages du son">
-            {prefs.enabled ? "🔊" : "🔇"}
+            <SoundIcon active={showSoundPanel} enabled={prefs.enabled} />
           </button>
         </div>
       </header>

@@ -4,6 +4,8 @@ import { useAudioDownloads } from "../hooks/useAudioDownloads";
 import { useArabicFont } from "../hooks/useArabicFont";
 import { useAyahByAyahPlayback } from "../hooks/useAyahByAyahPlayback";
 import { getDownloadedSurahUrl } from "../lib/audioDownloads";
+import { useShare } from "../hooks/useShare";
+import { transliterateArabic } from "../lib/transliteration";
 import ReciterAvatar from "../components/ReciterAvatar";
 import OrnamentalBorder from "../components/OrnamentalBorder";
 import "./Quran.css";
@@ -292,6 +294,7 @@ function SurahReader({
   const isDownloaded = downloads.downloadedSet.has(surahNumber);
   const downloadProgress = downloads.progress[surahNumber];
   const [karaokeMode, setKaraokeMode] = useState(false);
+  const { share } = useShare();
   const karaoke = useAyahByAyahPlayback(surah?.ayahs, selectedReciter);
   const [viewMode, setViewMode] = useState("list"); // "list" | "mushaf"
   const [mushafPageState, setMushafPageState] = useState({ surahNumber: null, index: 0 });
@@ -532,8 +535,24 @@ function SurahReader({
                     className={`ayah-row ${isActiveAyah ? "is-active-ayah" : ""} ${karaokeMode ? "is-clickable" : ""}`}
                     onClick={karaokeMode ? () => karaoke.playAyah(i) : undefined}
                   >
-                    <span className="ayah-number">{a.number}</span>
+                    <div className="ayah-row-top">
+                      <span className="ayah-number">{a.number}</span>
+                      <button
+                        className="ayah-share-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          share({
+                            title: `${surah.englishName} — verset ${a.number}`,
+                            text: `${a.arabic}\n\n${a.translation}\n\n— ${surah.englishName} (${surah.number}:${a.number}), via Waxtubi`,
+                          });
+                        }}
+                        aria-label="Partager ce verset"
+                      >
+                        ↗
+                      </button>
+                    </div>
                     <p className="ayah-arabic" lang="ar" dir="rtl">{a.arabic}</p>
+                    <p className="ayah-translit">{transliterateArabic(a.arabic)}</p>
                     <p className="ayah-translation">{a.translation}</p>
                   </li>
                 );

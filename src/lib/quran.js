@@ -36,6 +36,7 @@ const KNOWN_RECITERS = [
   { key: "shatri", label: "Abu Bakr Al-Shatri", match: ["shaatree", "shatri", "shatree"] },
   { key: "basit", label: "Abdul Basit", match: ["abdulbasit", "abdulbasitmurattal"] },
   { key: "jaber", label: "Ali Jaber", match: ["jaber", "jabir", "jabr"] },
+  { key: "mohaysani", label: "Rayan Al-Mohaysani", match: ["mohaysani", "muhaysini", "muhaisni", "mohaisani", "rayan"] },
 ];
 
 /**
@@ -134,7 +135,7 @@ export function getAyahAudioUrl(globalAyahNumber, reciterIdentifier) {
  * Résout l'identifiant d'édition "translation" à utiliser pour une langue donnée.
  * Préfère une édition de type "translation" ; à défaut, prend la première dispo.
  */
-async function resolveTranslationEdition(langCode) {
+export async function resolveTranslationEdition(langCode) {
   if (editionCache[langCode]) return editionCache[langCode];
 
   const res = await fetch(`${BASE}/edition/language/${langCode}`);

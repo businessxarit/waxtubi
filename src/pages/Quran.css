@@ -734,6 +734,15 @@
   text-align: right;
 }
 
+.ayah-translit {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--copper-bright);
+  margin: 0 0 var(--space-2);
+}
+
 .ayah-translation {
   font-family: var(--font-body);
   font-size: 15px;
