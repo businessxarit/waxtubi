@@ -87,6 +87,39 @@ disponibles, le karaoke est un mode optionnel en plus.
 - Toutes les animations respectent `prefers-reduced-motion` (désactivées
   automatiquement si l'utilisateur a ce réglage actif sur son téléphone)
 
+## Correction : téléchargement audio et récitateurs cassés
+
+Deux bugs liés à l'audio résolus :
+
+1. **Téléchargement hors-ligne impossible** — le CDN audio
+   (cdn.islamic.network) ne renvoie pas l'en-tête CORS nécessaire pour
+   qu'un `fetch()` programmatique fonctionne (seule la balise `<audio>`
+   en lecture simple s'en sortait). Solution : une fonction serverless
+   Vercel (`api/audio-proxy.js`) fait maintenant le relais — elle
+   télécharge le fichier côté serveur puis le renvoie avec les bons
+   en-têtes, contournant ainsi la restriction du navigateur.
+
+2. **Certains récitateurs ne fonctionnaient pas** — la liste des
+   récitateurs venait de l'API texte (alquran.cloud) mais l'audio est
+   servi par un CDN distinct (cdn.islamic.network) ; les identifiants
+   ne correspondaient pas toujours entre les deux. Le code vérifie
+   maintenant réellement (requête HEAD sur Al-Fatiha) que chaque
+   récitateur a un fichier audio fonctionnel sur le CDN avant de
+   l'afficher dans le sélecteur — les récitateurs cassés sont retirés
+   silencieusement plutôt que de planter à l'usage.
+
+## Objectif de Dhikr personnalisé
+
+Bouton 🎯 dans Dhikr : permet de fixer un nombre précis (ex. 1111, 313,
+99) au lieu du cycle fixe de 33. Une fois l'objectif défini :
+- Le compteur repart de zéro
+- Le chapelet s'arrête automatiquement (plus aucune perle ne s'ajoute,
+  plus aucun son) une fois le nombre atteint
+- Message "🎯 Objectif atteint !" affiché à l'arrivée
+- Bouton pour retirer l'objectif et revenir au cycle traditionnel de 33
+
+L'objectif est sauvegardé en localStorage et persiste entre les sessions.
+
 ## Duas du quotidien
 
 Accessible via le bouton 🤲 dans Dhikr. 7 catégories (réveil, sommeil,

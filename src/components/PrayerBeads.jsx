@@ -9,20 +9,21 @@ const VISIBLE_BEADS = 9; // nombre de perles visibles à l'écran à la fois
  * Remplace l'arc gradué pour la page Dhikr (identité visuelle propre
  * à Waxtubi : perles rendues en CSS, pas une copie d'une autre app).
  */
-export default function PrayerBeads({ count, cycleLength, onIncrement }) {
+export default function PrayerBeads({ count, cycleLength, onIncrement, disabled = false }) {
   const lastDragX = useRef(null);
   const dragDistance = useRef(0);
 
   const positionInCycle = count % cycleLength;
 
   const handlePointerDown = useCallback((e) => {
+    if (disabled) return;
     lastDragX.current = e.clientX;
     dragDistance.current = 0;
-  }, []);
+  }, [disabled]);
 
   const handlePointerMove = useCallback(
     (e) => {
-      if (lastDragX.current === null) return;
+      if (disabled || lastDragX.current === null) return;
       const delta = e.clientX - lastDragX.current;
       dragDistance.current += Math.abs(delta);
       // Glisser d'environ 28px fait avancer d'une perle
@@ -31,33 +32,39 @@ export default function PrayerBeads({ count, cycleLength, onIncrement }) {
         lastDragX.current = e.clientX;
       }
     },
-    [onIncrement]
+    [onIncrement, disabled]
   );
 
   const handlePointerUp = useCallback(() => {
+    if (disabled) {
+      lastDragX.current = null;
+      dragDistance.current = 0;
+      return;
+    }
     // Un simple tap (pas de vrai glissement) compte aussi comme une perle
     if (lastDragX.current !== null && dragDistance.current < 6) {
       onIncrement();
     }
     lastDragX.current = null;
     dragDistance.current = 0;
-  }, [onIncrement]);
+  }, [onIncrement, disabled]);
 
   const beads = Array.from({ length: VISIBLE_BEADS });
   const centerIndex = Math.floor(VISIBLE_BEADS / 2);
 
   return (
     <div
-      className="beads-track"
+      className={`beads-track ${disabled ? "is-disabled" : ""}`}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerLeave={handlePointerUp}
       role="button"
-      tabIndex={0}
+      tabIndex={disabled ? -1 : 0}
+      aria-disabled={disabled}
       aria-label="Glisser ou toucher pour compter une perle"
       onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") onIncrement();
+        if (!disabled && (e.key === "Enter" || e.key === " ")) onIncrement();
       }}
     >
       <div className="beads-guide-line" />

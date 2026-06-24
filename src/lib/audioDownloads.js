@@ -27,6 +27,17 @@ function storageKey(reciterIdentifier, surahNumber) {
 }
 
 /**
+ * Construit l'URL à appeler pour télécharger un fichier audio donné.
+ * Passe par notre fonction serverless /api/audio-proxy plutôt que
+ * d'appeler le CDN directement : le CDN ne renvoie pas l'en-tête CORS
+ * nécessaire pour qu'un fetch() programmatique fonctionne (la balise
+ * <audio> seule s'en sort, mais pas le téléchargement pour le hors-ligne).
+ */
+function toProxiedUrl(originalUrl) {
+  return `/api/audio-proxy?url=${encodeURIComponent(originalUrl)}`;
+}
+
+/**
  * Télécharge un fichier audio de sourate et le stocke en local.
  * @param {string} url
  * @param {string} reciterIdentifier
@@ -36,11 +47,10 @@ function storageKey(reciterIdentifier, surahNumber) {
 export async function downloadSurahAudio(url, reciterIdentifier, surahNumber, onProgress) {
   let res;
   try {
-    res = await fetch(url, { mode: "cors" });
+    res = await fetch(toProxiedUrl(url));
   } catch {
-    // Échec réseau pur (hors-ligne, ou requête bloquée avant même la
-    // réponse — souvent un signe de restriction CORS côté serveur).
-    throw new Error("Connexion au serveur audio impossible (réseau ou restriction d'accès)");
+    // Échec réseau pur (hors-ligne, ou serveur de relais indisponible).
+    throw new Error("Connexion au serveur audio impossible (réseau)");
   }
 
   if (!res.ok) {

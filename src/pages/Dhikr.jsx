@@ -9,8 +9,9 @@ import { fetchDhikrCount, saveDhikrCount } from "../lib/dhikrSync";
 import { fetchAsmaAlHusna } from "../lib/asmaAlHusna";
 import "./Dhikr.css";
 
-const CYCLE_LENGTH = 33; // cycle traditionnel du tasbih
+const CYCLE_LENGTH = 33; // cycle traditionnel du tasbih, utilisé tant qu'aucun objectif n'est fixé
 const SAVE_DEBOUNCE_MS = 1500;
+const GOAL_STORAGE_KEY = "waxtubi:dhikr:goal";
 
 export default function Dhikr() {
   const { user, loading: authLoading } = useAuth();
@@ -20,6 +21,12 @@ export default function Dhikr() {
   const [showAccountPanel, setShowAccountPanel] = useState(false);
   const [showNamesPanel, setShowNamesPanel] = useState(false);
   const [showDuas, setShowDuas] = useState(false);
+  const [showGoalPanel, setShowGoalPanel] = useState(false);
+  const [goal, setGoal] = useState(() => {
+    const saved = localStorage.getItem(GOAL_STORAGE_KEY);
+    return saved ? Number(saved) : null;
+  });
+  const [goalInput, setGoalInput] = useState("");
   const { prefs, play, setEnabled, setVariant, setVolume } = useBeadSound();
   const saveTimeoutRef = useRef(null);
 
@@ -42,14 +49,42 @@ export default function Dhikr() {
     return () => clearTimeout(saveTimeoutRef.current);
   }, [count, user, hasLoadedRemote]);
 
+  useEffect(() => {
+    if (goal) localStorage.setItem(GOAL_STORAGE_KEY, String(goal));
+    else localStorage.removeItem(GOAL_STORAGE_KEY);
+  }, [goal]);
+
+  const reachedGoal = Boolean(goal) && count >= goal;
+
   const increment = useCallback(() => {
+    // Une fois l'objectif atteint, le compteur s'arrête : les touches
+    // supplémentaires ne font plus rien (pas de son ni d'incrément).
+    if (goal && count >= goal) return;
     setCount((c) => c + 1);
     play();
-  }, [play]);
+  }, [play, goal, count]);
 
-  const reset = useCallback(() => setCount(0), []);
+  const reset = useCallback(() => {
+    setCount(0);
+  }, []);
 
-  const completedCycles = Math.floor(count / CYCLE_LENGTH);
+  function applyGoal() {
+    const n = parseInt(goalInput, 10);
+    if (Number.isFinite(n) && n > 0) {
+      setGoal(n);
+      setCount(0);
+      setGoalInput("");
+      setShowGoalPanel(false);
+    }
+  }
+
+  function clearGoal() {
+    setGoal(null);
+    setShowGoalPanel(false);
+  }
+
+  const completedCycles = goal ? null : Math.floor(count / CYCLE_LENGTH);
+  const progress = goal ? Math.min(1, count / goal) : (count % CYCLE_LENGTH) / CYCLE_LENGTH;
   const hasRealAccount = user && !user.isAnonymous;
 
   function togglePanel(panel) {
@@ -57,6 +92,7 @@ export default function Dhikr() {
     setShowSoundPanel(panel === "sound" ? (s) => !s : false);
     setShowNamesPanel(panel === "names" ? (s) => !s : false);
     setShowDuas(panel === "duas" ? (s) => !s : false);
+    setShowGoalPanel(panel === "goal" ? (s) => !s : false);
   }
 
   if (showDuas) {
@@ -69,6 +105,9 @@ export default function Dhikr() {
         <span className="home-eyebrow">Dhikr</span>
         <h1 className="dhikr-title">Compteur</h1>
         <div className="dhikr-header-actions">
+          <button className="dhikr-icon-btn" onClick={() => togglePanel("goal")} aria-label="Définir un objectif">
+            🎯
+          </button>
           <button className="dhikr-icon-btn" onClick={() => togglePanel("duas")} aria-label="Duas du quotidien">
             🤲
           </button>
@@ -83,6 +122,37 @@ export default function Dhikr() {
           </button>
         </div>
       </header>
+
+      {showGoalPanel && (
+        <div className="goal-panel">
+          <p className="goal-panel-text">
+            Fixe un objectif (ex. 1111, 313, 99) — le compteur s'arrêtera
+            automatiquement une fois atteint.
+          </p>
+          <div className="goal-panel-row">
+            <input
+              type="number"
+              inputMode="numeric"
+              min="1"
+              placeholder="Ex. 1111"
+              value={goalInput}
+              onChange={(e) => setGoalInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") applyGoal();
+              }}
+              className="goal-input"
+            />
+            <button className="goal-apply-btn" onClick={applyGoal}>
+              Définir
+            </button>
+          </div>
+          {goal && (
+            <button className="goal-clear-btn" onClick={clearGoal}>
+              Retirer l'objectif (revenir au cycle de 33)
+            </button>
+          )}
+        </div>
+      )}
 
       {showNamesPanel && <AsmaAlHusnaPanel onClose={() => setShowNamesPanel(false)} />}
 
@@ -121,11 +191,29 @@ export default function Dhikr() {
           <div className="dhikr-count-display">
             <span className="dhikr-count-value">{count}</span>
             <span className="dhikr-count-sub">
-              {completedCycles > 0 ? `${completedCycles} tour${completedCycles > 1 ? "s" : ""} complet${completedCycles > 1 ? "s" : ""}` : "Glisse ou touche les perles"}
+              {goal
+                ? reachedGoal
+                  ? "🎯 Objectif atteint !"
+                  : `Objectif : ${goal}`
+                : completedCycles > 0
+                  ? `${completedCycles} tour${completedCycles > 1 ? "s" : ""} complet${completedCycles > 1 ? "s" : ""}`
+                  : "Glisse ou touche les perles"}
             </span>
           </div>
 
-          <PrayerBeads count={count} cycleLength={CYCLE_LENGTH} onIncrement={increment} />
+          <PrayerBeads
+            count={count}
+            cycleLength={goal ?? CYCLE_LENGTH}
+            onIncrement={increment}
+            disabled={reachedGoal}
+            progress={progress}
+          />
+
+          {reachedGoal && (
+            <p className="goal-reached-note">
+              Le compteur s'est arrêté à {goal}. Touche « Réinitialiser » pour recommencer.
+            </p>
+          )}
 
           <button className="dhikr-reset-btn" onClick={reset}>
             Réinitialiser

@@ -40,8 +40,14 @@ const KNOWN_RECITERS = [
 
 /**
  * Récupère et met en cache la liste réelle des éditions audio arabes
- * disponibles sur alquran.cloud, puis fait correspondre les
- * récitateurs connus à ce catalogue.
+ * disponibles sur alquran.cloud, fait correspondre les récitateurs
+ * connus à ce catalogue, PUIS vérifie que le fichier audio existe
+ * réellement sur le CDN (cdn.islamic.network) pour la sourate Al-Fatiha
+ * avec cet identifiant — les deux catalogues (API texte/métadonnées vs
+ * CDN audio) ne partagent pas forcément les mêmes identifiants, donc un
+ * récitateur "trouvé" côté API peut tout de même n'avoir aucun fichier
+ * audio correspondant. Les récitateurs sans fichier vérifié sont
+ * silencieusement retirés du sélecteur plutôt que de planter à l'usage.
  */
 export async function fetchAvailableReciters() {
   if (audioEditionsCache) return audioEditionsCache;
@@ -51,15 +57,30 @@ export async function fetchAvailableReciters() {
   const json = await res.json();
   const editions = json.data || [];
 
-  const matched = [];
+  const candidates = [];
   for (const reciter of KNOWN_RECITERS) {
     const found = editions.find((e) =>
       reciter.match.some((kw) => e.identifier.toLowerCase().includes(kw) || e.englishName.toLowerCase().includes(kw))
     );
     if (found) {
-      matched.push({ key: reciter.key, label: reciter.label, identifier: found.identifier });
+      candidates.push({ key: reciter.key, label: reciter.label, identifier: found.identifier });
     }
   }
+
+  // Vérifie en parallèle que chaque candidat a bien un fichier audio
+  // pour Al-Fatiha (sourate 1) sur le CDN — test rapide et léger (HEAD)
+  // plutôt que de télécharger le fichier entier.
+  const checked = await Promise.all(
+    candidates.map(async (c) => {
+      try {
+        const checkRes = await fetch(getSurahAudioUrl(1, c.identifier), { method: "HEAD" });
+        return checkRes.ok ? c : null;
+      } catch {
+        return null;
+      }
+    })
+  );
+  const matched = checked.filter(Boolean);
 
   // Toujours garder Alafasy en secours en tête de liste si rien d'autre n'est trouvé
   audioEditionsCache = matched.length > 0 ? matched : [{ key: "alafasy", label: "Mishary Alafasy", identifier: "ar.alafasy" }];

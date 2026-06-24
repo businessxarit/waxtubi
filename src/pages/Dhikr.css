@@ -246,6 +246,72 @@
   gap: var(--space-3);
 }
 
+.goal-panel {
+  width: 100%;
+  max-width: 320px;
+  background: var(--ink-soft);
+  border: 1px solid var(--ink-raised);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin-bottom: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.goal-panel-text {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--sand-dim);
+  margin: 0;
+}
+
+.goal-panel-row {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.goal-input {
+  flex: 1;
+  background: var(--ink);
+  border: 1px solid var(--ink-raised);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  color: var(--sand);
+  font-family: var(--font-mono);
+  font-size: 16px;
+}
+
+.goal-apply-btn {
+  background: var(--copper);
+  color: var(--ink);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.goal-clear-btn {
+  background: none;
+  border: 1px solid var(--ink-raised);
+  color: var(--sand-dim);
+  font-family: var(--font-body);
+  font-size: 12px;
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.goal-reached-note {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--sage);
+  text-align: center;
+  margin: var(--space-4) 0 0;
+}
+
 .dhikr-sound-row {
   display: flex;
   align-items: center;
