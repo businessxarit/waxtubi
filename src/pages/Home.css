@@ -146,6 +146,29 @@
   color: var(--sage);
 }
 
+.notif-tone-switch {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin-top: var(--space-2);
+}
+
+.notif-tone-switch button {
+  background: var(--ink-soft);
+  border: 1px solid var(--ink-raised);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-3);
+  color: var(--sand-dim);
+  font-family: var(--font-body);
+  font-size: 11px;
+}
+
+.notif-tone-switch button.is-active {
+  border-color: var(--copper);
+  color: var(--copper-bright);
+}
+
 .notif-denied-note {
   font-family: var(--font-body);
   font-size: 11px;

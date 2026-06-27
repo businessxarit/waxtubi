@@ -87,6 +87,54 @@ disponibles, le karaoke est un mode optionnel en plus.
 - Toutes les animations respectent `prefers-reduced-motion` (désactivées
   automatiquement si l'utilisateur a ce réglage actif sur son téléphone)
 
+## Calculateur de Zakat, arbre de streak & tonalités de notification
+
+**Calculateur de Zakat** (bouton "Zakat" dans la page Calendrier) :
+- Taux de 2,5% sur la richesse zakatable au-dessus du Nisab
+- Nisab basé sur l'or (87,48g) ou l'argent (612,36g), au choix — l'argent
+  est l'option la plus prudente, recommandée par de nombreux savants
+- Prix de l'or/argent récupérés en direct via gold-api.com (gratuite,
+  CORS activé, sans clé) — jamais une valeur codée en dur
+- Reste neutre sur le désaccord entre écoles concernant les bijoux
+  portés au quotidien (hanafite vs malikite/chafiite/hanbalite)
+- Rappel explicite de la condition du Hawl (richesse détenue un an
+  lunaire complet), que l'outil ne peut pas vérifier automatiquement
+- Avertissement clair : estimation pratique, pas un avis savant (fatwa)
+
+**Arbre de streak** (page Statistiques) : le streak de dhikr est
+maintenant représenté par un arbre stylisé qui gagne des branches à
+mesure que la série de jours augmente (graine → bourgeon → arbre en
+pleine force), en plus du chiffre brut. Dessiné en SVG, dans l'esprit
+géométrique Waxtubi.
+
+**Tonalités de notification** (page Accueil, sous le bouton des
+rappels) : 3 choix de signal sonore pour les rappels de prière. Note
+honnête : ce sont des sons synthétisés (Web Audio API), pas des
+enregistrements du véritable Adhan — aucune source audio fiable et
+vérifiée n'a été trouvée à héberger pour ça, et la plupart des
+navigateurs/OS ignorent de toute façon le son personnalisé des
+notifications web.
+
+## Correction : récitateurs filtrés à tort & erreur Jours Blancs
+
+1. **Un seul récitateur affiché (au lieu de plusieurs)** — la vérification
+   de disponibilité de chaque récitateur (requête HEAD vers le CDN audio)
+   échouait pour CORS, exactement comme le téléchargement précédemment
+   corrigé. Cette vérification passe maintenant par le proxy serverless
+   (`api/audio-proxy.js`, qui supporte désormais aussi les requêtes HEAD
+   légères), donc les récitateurs réellement disponibles sont à nouveau
+   détectés correctement.
+
+2. **Erreur "FetchEvent.respondWith ... no-response" sur les Jours
+   Blancs** — la vue "Jours Blancs de l'année" lance 36 requêtes réseau
+   en une fois (12 mois × 3 jours) ; si une seule échouait, le service
+   worker remontait une erreur opaque et tout l'affichage plantait.
+   Corrigé en deux points : chaque conversion de date échoue maintenant
+   indépendamment des autres (`Promise.allSettled` plutôt que
+   `Promise.all`), et le service worker abandonne plus vite vers le
+   réseau normal si une réponse ne vient pas assez rapidement
+   (`networkTimeoutSeconds`), au lieu de rester bloqué sans réponse.
+
 ## Correction : téléchargement audio et récitateurs cassés
 
 Deux bugs liés à l'audio résolus :

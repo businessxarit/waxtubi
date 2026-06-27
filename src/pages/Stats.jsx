@@ -1,4 +1,5 @@
 import { computePersonalStats } from "../lib/personalStats";
+import StreakTree from "../components/StreakTree";
 import "./Stats.css";
 
 export default function Stats({ onBack }) {
@@ -12,11 +13,14 @@ export default function Stats({ onBack }) {
         <h1 className="stats-title">Ton parcours</h1>
       </header>
 
+      <div className="stats-tree-section">
+        <StreakTree streak={stats.dhikrStreak} />
+        <p className="stats-tree-caption">
+          {stats.dhikrStreak} jour{stats.dhikrStreak > 1 ? "s" : ""} de suite en dhikr
+        </p>
+      </div>
+
       <div className="stats-grid">
-        <div className="stats-card">
-          <span className="stats-value">{stats.dhikrStreak}</span>
-          <span className="stats-label">jour{stats.dhikrStreak > 1 ? "s" : ""} de suite en dhikr</span>
-        </div>
         <div className="stats-card">
           <span className="stats-value">{stats.totalDhikr.toLocaleString("fr-FR")}</span>
           <span className="stats-label">dhikr au total</span>

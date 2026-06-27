@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { playNotificationTone } from "../lib/notificationSound";
 
 const STORAGE_KEY = "waxtubi:notifications:enabled";
+const TONE_STORAGE_KEY = "waxtubi:notifications:tone";
 const NOTIFIED_KEY_PREFIX = "waxtubi:notified:";
 
 const NOTIFICATIONS_SUPPORTED = typeof window !== "undefined" && "Notification" in window;
@@ -11,10 +13,19 @@ const NOTIFICATIONS_SUPPORTED = typeof window !== "undefined" && "Notification" 
  * fonctionne que si l'app/onglet reste ouvert (ou l'a été récemment et
  * que le navigateur garde le service worker actif). Sur iOS, nécessite
  * que la PWA soit installée sur l'écran d'accueil.
+ *
+ * Le son joué au moment de la notification est un signal synthétisé
+ * (pas un enregistrement du véritable Adhan) — la plupart des
+ * navigateurs/OS ignorent de toute façon le son personnalisé des
+ * notifications web, donc on joue ce signal nous-mêmes côté app tant
+ * qu'elle est ouverte.
  */
 export function usePrayerNotifications(timings) {
   const [enabled, setEnabled] = useState(
     () => localStorage.getItem(STORAGE_KEY) === "true"
+  );
+  const [tone, setTone] = useState(
+    () => localStorage.getItem(TONE_STORAGE_KEY) || "chime"
   );
   const [permission, setPermission] = useState(
     NOTIFICATIONS_SUPPORTED ? Notification.permission : "unsupported"
@@ -24,6 +35,10 @@ export function usePrayerNotifications(timings) {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, String(enabled));
   }, [enabled]);
+
+  useEffect(() => {
+    localStorage.setItem(TONE_STORAGE_KEY, tone);
+  }, [tone]);
 
   const requestPermission = useCallback(async () => {
     if (!NOTIFICATIONS_SUPPORTED) return false;
@@ -63,6 +78,7 @@ export function usePrayerNotifications(timings) {
             icon: "/icon-192.png",
             tag: `prayer-${prayer.key}`,
           });
+          playNotificationTone(tone);
           localStorage.setItem(notifiedKey, "1");
         } catch {
           // Échec silencieux (navigateur ayant révoqué la permission entre temps, etc.)
@@ -75,7 +91,7 @@ export function usePrayerNotifications(timings) {
     return () => {
       timeoutsRef.current.forEach(clearTimeout);
     };
-  }, [enabled, timings, permission]);
+  }, [enabled, timings, permission, tone]);
 
   const setEnabledSafely = useCallback(
     (next) => {
@@ -93,5 +109,7 @@ export function usePrayerNotifications(timings) {
     permission,
     enabled: enabled && permission === "granted",
     setEnabled: setEnabledSafely,
+    tone,
+    setTone,
   };
 }

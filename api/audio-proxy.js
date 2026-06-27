@@ -12,7 +12,8 @@
 // renvoie avec les en-têtes CORS corrects. Le navigateur ne voit alors
 // qu'une requête vers ton propre domaine — plus de blocage.
 export default async function handler(req, res) {
-  const { url } = req.query;
+  const { url, method } = req.query;
+  const useHead = method === "HEAD";
 
   if (!url || typeof url !== "string") {
     res.status(400).json({ error: "Paramètre 'url' manquant" });
@@ -36,7 +37,17 @@ export default async function handler(req, res) {
   }
 
   try {
-    const upstream = await fetch(parsed.toString());
+    // Pour une simple vérification de disponibilité (utilisée pour
+    // filtrer les récitateurs fonctionnels), on fait un HEAD léger
+    // côté serveur — pas de téléchargement du fichier entier.
+    const upstream = await fetch(parsed.toString(), { method: useHead ? "HEAD" : "GET" });
+
+    if (useHead) {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.status(upstream.ok ? 200 : upstream.status).end();
+      return;
+    }
+
     if (!upstream.ok) {
       res.status(upstream.status).json({ error: `Le serveur audio a répondu ${upstream.status}` });
       return;

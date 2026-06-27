@@ -33,10 +33,15 @@ export default defineConfig({
           {
             // Horaires de prière et Hijri (Aladhan) : cache court, car
             // ça dépend du jour — on rafraîchit dès que le réseau revient.
+            // networkTimeoutSeconds force Workbox à retomber sur le cache
+            // (ou à laisser l'erreur remonter normalement à l'app) plutôt
+            // que de rester bloqué sans réponse si le réseau est lent ou
+            // capricieux — évite l'erreur "no-response" silencieuse.
             urlPattern: /^https:\/\/api\.aladhan\.com\/v1\//,
             handler: 'NetworkFirst',
             options: {
               cacheName: 'prayer-times-cache',
+              networkTimeoutSeconds: 8,
               expiration: {
                 maxEntries: 50,
                 maxAgeSeconds: 60 * 60 * 24, // 1 jour

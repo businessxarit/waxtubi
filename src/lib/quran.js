@@ -70,11 +70,15 @@ export async function fetchAvailableReciters() {
 
   // Vérifie en parallèle que chaque candidat a bien un fichier audio
   // pour Al-Fatiha (sourate 1) sur le CDN — test rapide et léger (HEAD)
-  // plutôt que de télécharger le fichier entier.
+  // via notre proxy serverless plutôt que d'appeler le CDN directement :
+  // le CDN ne renvoie pas l'en-tête CORS nécessaire pour un fetch
+  // programmatique, même pour une simple requête HEAD.
   const checked = await Promise.all(
     candidates.map(async (c) => {
       try {
-        const checkRes = await fetch(getSurahAudioUrl(1, c.identifier), { method: "HEAD" });
+        const checkRes = await fetch(
+          `/api/audio-proxy?url=${encodeURIComponent(getSurahAudioUrl(1, c.identifier))}&method=HEAD`
+        );
         return checkRes.ok ? c : null;
       } catch {
         return null;

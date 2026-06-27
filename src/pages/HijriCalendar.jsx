@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
+import Zakat from "./Zakat";
 import {
   toggleFastingDay,
   getLocalFastingLog,
@@ -33,6 +34,7 @@ export default function HijriCalendar() {
   const [currentMonthNumber, setCurrentMonthNumber] = useState(null);
   const [currentDay, setCurrentDay] = useState(null);
   const [openMonth, setOpenMonth] = useState(null); // numéro de mois ouvert en détail, ou null
+  const [showZakat, setShowZakat] = useState(false);
 
   useEffect(() => {
     // Récupère juste la date Hijri du jour (sans géoloc, peu importe la
@@ -48,6 +50,10 @@ export default function HijriCalendar() {
         // En cas d'échec silencieux, on affiche simplement la liste sans surlignage
       });
   }, []);
+
+  if (showZakat) {
+    return <Zakat onBack={() => setShowZakat(false)} />;
+  }
 
   if (openMonth !== null && currentYear) {
     return (
@@ -65,6 +71,9 @@ export default function HijriCalendar() {
     <div className="hijri-page">
       <header className="hijri-header">
         <span className="home-eyebrow">Calendrier</span>
+        <button className="hijri-zakat-btn" onClick={() => setShowZakat(true)}>
+          Zakat
+        </button>
         <h1 className="hijri-title">
           Année hijri{currentYear ? ` · ${currentYear}h` : ""}
         </h1>
@@ -110,26 +119,36 @@ function YearWhiteDaysOverview({ year, currentMonthNumber, currentDay, onOpenMon
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      try {
-        const perMonth = await Promise.all(
-          HIJRI_MONTHS.map(async (m) => {
-            const days = await Promise.all(
-              WHITE_DAYS.map(async (day) => {
-                const res = await fetch(
-                  `https://api.aladhan.com/v1/hToG/${String(day).padStart(2, "0")}-${String(m.number).padStart(2, "0")}-${year}`
-                );
-                if (!res.ok) throw new Error("Conversion de date indisponible");
-                const json = await res.json();
-                return { hijriDay: day, gregorian: json.data.gregorian };
-              })
-            );
-            return { monthNumber: m.number, monthName: m.name, days };
-          })
-        );
-        if (!cancelled) setAllWhiteDays(perMonth);
-      } catch (e) {
-        if (!cancelled) setError(e.message);
+      const perMonth = await Promise.all(
+        HIJRI_MONTHS.map(async (m) => {
+          const dayResults = await Promise.allSettled(
+            WHITE_DAYS.map(async (day) => {
+              const res = await fetch(
+                `https://api.aladhan.com/v1/hToG/${String(day).padStart(2, "0")}-${String(m.number).padStart(2, "0")}-${year}`
+              );
+              if (!res.ok) throw new Error("Conversion de date indisponible");
+              const json = await res.json();
+              return { hijriDay: day, gregorian: json.data.gregorian };
+            })
+          );
+          // Garde seulement les jours convertis avec succès — un échec
+          // réseau ponctuel sur un jour n'efface plus tout le mois.
+          const days = dayResults
+            .filter((r) => r.status === "fulfilled")
+            .map((r) => r.value);
+          return { monthNumber: m.number, monthName: m.name, days };
+        })
+      );
+
+      if (cancelled) return;
+
+      const hasAnyResult = perMonth.some((m) => m.days.length > 0);
+      if (!hasAnyResult) {
+        setError("Impossible de calculer les Jours Blancs pour le moment (problème réseau).");
+        return;
       }
+      setAllWhiteDays(perMonth);
+      setError(null);
     })();
     return () => {
       cancelled = true;

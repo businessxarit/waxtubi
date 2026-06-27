@@ -4,6 +4,7 @@ import { usePrayerNotifications } from "../hooks/usePrayerNotifications";
 import { useFirstName } from "../hooks/useFirstName";
 import { useAuth } from "../hooks/useAuth";
 import { fetchTodaysVerse } from "../lib/verseOfTheDay";
+import { NOTIFICATION_TONES, playNotificationTone } from "../lib/notificationSound";
 import {
   togglePrayerDone,
   getTodaysPrayerLog,
@@ -136,6 +137,22 @@ export default function Home() {
           >
             {notifications.enabled ? "🔔 Rappels activés" : "🔕 Activer les rappels de prière"}
           </button>
+        )}
+        {notifications.enabled && (
+          <div className="notif-tone-switch">
+            {NOTIFICATION_TONES.map((t) => (
+              <button
+                key={t.id}
+                className={notifications.tone === t.id ? "is-active" : ""}
+                onClick={() => {
+                  notifications.setTone(t.id);
+                  playNotificationTone(t.id);
+                }}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
         )}
         {notifications.permission === "denied" && (
           <p className="notif-denied-note">
