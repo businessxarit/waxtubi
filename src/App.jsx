@@ -1,6 +1,7 @@
 import { useState, Suspense, lazy } from "react";
 import { useTheme } from "./hooks/useTheme";
 import { useArabicFont } from "./hooks/useArabicFont";
+import { PremiumProvider } from "./context/PremiumContext";
 import NavBar from "./components/NavBar";
 import ThemeToggle from "./components/ThemeToggle";
 import SplashScreen from "./components/SplashScreen";
@@ -41,7 +42,7 @@ export default function App() {
   }
 
   return (
-    <>
+    <PremiumProvider>
       <div className="app-topbar">
         <ThemeToggle preference={preference} onChange={setTheme} />
       </div>
@@ -51,6 +52,6 @@ export default function App() {
         </Suspense>
       </main>
       <NavBar active={active} onChange={setActive} />
-    </>
+    </PremiumProvider>
   );
 }

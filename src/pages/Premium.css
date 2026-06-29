@@ -1,0 +1,158 @@
+.premium-page {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5) var(--space-8);
+}
+
+.premium-header {
+  text-align: center;
+  margin-bottom: var(--space-6);
+  position: relative;
+}
+
+.premium-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: none;
+  border: none;
+  color: var(--sand-dim);
+  font-family: var(--font-body);
+  font-size: 13px;
+}
+
+.premium-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--sand);
+  margin: var(--space-2) 0 0;
+}
+
+.premium-status {
+  text-align: center;
+  color: var(--sand-dim);
+  font-family: var(--font-body);
+}
+
+.premium-active-card {
+  background: var(--ink-soft);
+  border: 1px solid var(--sage);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  text-align: center;
+}
+
+.premium-active-card p {
+  font-family: var(--font-body);
+  color: var(--sand);
+  margin: 0 0 var(--space-2);
+}
+
+.premium-active-note {
+  font-size: 12px;
+  color: var(--sand-dim);
+}
+
+.premium-benefits {
+  list-style: none;
+  margin: 0 0 var(--space-6);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.premium-benefit-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  background: var(--ink-soft);
+  border: 1px solid var(--ink-raised);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+
+.premium-benefit-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.premium-benefit-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.premium-benefit-text strong {
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--sand);
+}
+
+.premium-benefit-text span {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--sand-dim);
+  line-height: 1.4;
+}
+
+.premium-plans {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.premium-plan-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--ink-soft);
+  border: 1px solid var(--ink-raised);
+  border-radius: var(--radius-md);
+  padding: var(--space-5) var(--space-3);
+  text-decoration: none;
+}
+
+.premium-plan-card.is-best {
+  border-color: var(--copper);
+  background: linear-gradient(160deg, var(--ink-raised), var(--ink-soft));
+}
+
+.premium-plan-badge {
+  position: absolute;
+  top: -10px;
+  background: var(--copper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.premium-plan-label {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--sand);
+}
+
+.premium-plan-cta {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--copper-bright);
+  font-weight: 500;
+}
+
+.premium-note {
+  font-family: var(--font-body);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--sand-dim);
+  text-align: center;
+  margin: 0;
+}

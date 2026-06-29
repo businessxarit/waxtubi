@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import Zakat from "./Zakat";
+import Premium from "./Premium";
 import {
   toggleFastingDay,
   getLocalFastingLog,
@@ -35,6 +36,7 @@ export default function HijriCalendar() {
   const [currentDay, setCurrentDay] = useState(null);
   const [openMonth, setOpenMonth] = useState(null); // numéro de mois ouvert en détail, ou null
   const [showZakat, setShowZakat] = useState(false);
+  const [showPremium, setShowPremium] = useState(false);
 
   useEffect(() => {
     // Récupère juste la date Hijri du jour (sans géoloc, peu importe la
@@ -55,6 +57,10 @@ export default function HijriCalendar() {
     return <Zakat onBack={() => setShowZakat(false)} />;
   }
 
+  if (showPremium) {
+    return <Premium onBack={() => setShowPremium(false)} />;
+  }
+
   if (openMonth !== null && currentYear) {
     return (
       <MonthDetailView
@@ -71,9 +77,14 @@ export default function HijriCalendar() {
     <div className="hijri-page">
       <header className="hijri-header">
         <span className="home-eyebrow">Calendrier</span>
-        <button className="hijri-zakat-btn" onClick={() => setShowZakat(true)}>
-          Zakat
-        </button>
+        <div className="hijri-header-actions">
+          <button className="hijri-zakat-btn" onClick={() => setShowZakat(true)}>
+            Zakat
+          </button>
+          <button className="hijri-premium-btn" onClick={() => setShowPremium(true)}>
+            ✨ Premium
+          </button>
+        </div>
         <h1 className="hijri-title">
           Année hijri{currentYear ? ` · ${currentYear}h` : ""}
         </h1>

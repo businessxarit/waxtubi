@@ -505,6 +505,29 @@
   margin: 0 0 var(--space-2);
 }
 
+.download-limit-notice {
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--copper-bright);
+  background: var(--ink);
+  border: 1px solid var(--copper);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  margin: 0;
+}
+
+.download-limit-notice button {
+  background: none;
+  border: none;
+  color: var(--copper-bright);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: underline;
+  padding: 0;
+}
+
 .download-panel-btn {
   background: var(--copper);
   color: var(--ink);

@@ -1,13 +1,15 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { fetchSurahList, fetchSurah, fetchAvailableReciters, getSurahAudioUrl, searchQuran, TRANSLATION_LANGUAGES } from "../lib/quran";
-import { useAudioDownloads } from "../hooks/useAudioDownloads";
+import { useAudioDownloads, FREE_DOWNLOAD_LIMIT } from "../hooks/useAudioDownloads";
 import { useArabicFont } from "../hooks/useArabicFont";
 import { useAyahByAyahPlayback } from "../hooks/useAyahByAyahPlayback";
 import { getDownloadedSurahUrl } from "../lib/audioDownloads";
 import { useShare } from "../hooks/useShare";
+import { usePremium } from "../hooks/usePremium";
 import { transliterateArabic } from "../lib/transliteration";
 import ReciterAvatar from "../components/ReciterAvatar";
 import OrnamentalBorder from "../components/OrnamentalBorder";
+import Premium from "./Premium";
 import "./Quran.css";
 
 const LANG_STORAGE_KEY = "waxtubi:quran:lang";
@@ -32,6 +34,7 @@ export default function Quran() {
     () => localStorage.getItem(RECITER_STORAGE_KEY) || null
   );
   const [showDownloadPanel, setShowDownloadPanel] = useState(false);
+  const [showPremium, setShowPremium] = useState(false);
 
   useEffect(() => {
     fetchSurahList()
@@ -83,7 +86,8 @@ export default function Quran() {
     if (selectedReciter) localStorage.setItem(RECITER_STORAGE_KEY, selectedReciter);
   }, [selectedReciter]);
 
-  const downloads = useAudioDownloads(selectedReciter);
+  const { isPremium } = usePremium();
+  const downloads = useAudioDownloads(selectedReciter, isPremium);
   const currentReciterLabel = reciters?.find((r) => r.identifier === selectedReciter)?.label;
   const arabicFont = useArabicFont();
   const [showFontPanel, setShowFontPanel] = useState(false);
@@ -99,6 +103,10 @@ export default function Quran() {
         String(s.number) === q
     );
   }, [surahList, search]);
+
+  if (showPremium) {
+    return <Premium onBack={() => setShowPremium(false)} />;
+  }
 
   if (activeSurahNumber) {
     return (
@@ -203,10 +211,11 @@ export default function Quran() {
               </p>
               <p className="download-panel-size">
                 {downloads.downloadedSet.size} / 114 sourates téléchargées
+                {!isPremium && ` (limite gratuite : ${FREE_DOWNLOAD_LIMIT})`}
               </p>
 
               {!downloads.bulkRunning ? (
-                <button className="download-panel-btn" onClick={downloads.downloadAll}>
+                <button className="download-panel-btn" onClick={downloads.downloadAll} disabled={downloads.hasReachedFreeLimit}>
                   Tout télécharger (≈ 350-500 Mo)
                 </button>
               ) : (
@@ -219,6 +228,13 @@ export default function Quran() {
                 <button className="download-panel-btn-text" onClick={downloads.removeAll}>
                   Supprimer tous les téléchargements
                 </button>
+              )}
+
+              {downloads.limitReachedNotice && !isPremium && (
+                <p className="download-limit-notice">
+                  Limite gratuite de {FREE_DOWNLOAD_LIMIT} sourates hors-ligne atteinte.{" "}
+                  <button onClick={() => setShowPremium(true)}>Passer à Premium →</button> pour un téléchargement illimité.
+                </p>
               )}
 
               {downloads.error && <p className="quran-status quran-error">{downloads.error}</p>}

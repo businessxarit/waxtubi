@@ -8,12 +8,18 @@ import {
 } from "../lib/audioDownloads";
 import { getSurahAudioUrl } from "../lib/quran";
 
-export function useAudioDownloads(reciterIdentifier) {
+// Limite de téléchargements hors-ligne en version gratuite — au-delà,
+// il faut Premium pour continuer. Le streaming reste illimité dans
+// tous les cas, seul le stockage hors-ligne est limité.
+export const FREE_DOWNLOAD_LIMIT = 10;
+
+export function useAudioDownloads(reciterIdentifier, isPremium = false) {
   const [downloadedSet, setDownloadedSet] = useState(new Set());
   const [progress, setProgress] = useState({}); // { [surahNumber]: { received, total } }
   const [bulkRunning, setBulkRunning] = useState(false);
   const [bulkCancelled, setBulkCancelled] = useState(false);
   const [error, setError] = useState(null);
+  const [limitReachedNotice, setLimitReachedNotice] = useState(false);
 
   const refreshDownloadedList = useCallback(async () => {
     if (!reciterIdentifier) return;
@@ -43,9 +49,15 @@ export function useAudioDownloads(reciterIdentifier) {
     };
   }, [reciterIdentifier]);
 
+  const hasReachedFreeLimit = !isPremium && downloadedSet.size >= FREE_DOWNLOAD_LIMIT;
+
   const downloadOne = useCallback(
     async (surahNumber) => {
       if (!reciterIdentifier) return;
+      if (!isPremium && downloadedSet.size >= FREE_DOWNLOAD_LIMIT && !downloadedSet.has(surahNumber)) {
+        setLimitReachedNotice(true);
+        return;
+      }
       setError(null);
       try {
         const url = getSurahAudioUrl(surahNumber, reciterIdentifier);
@@ -62,7 +74,7 @@ export function useAudioDownloads(reciterIdentifier) {
         setError(`Téléchargement de la sourate ${surahNumber} échoué : ${e.message}`);
       }
     },
-    [reciterIdentifier, refreshDownloadedList]
+    [reciterIdentifier, refreshDownloadedList, isPremium, downloadedSet]
   );
 
   const removeOne = useCallback(
@@ -77,17 +89,26 @@ export function useAudioDownloads(reciterIdentifier) {
   /**
    * Télécharge toutes les sourates (1 à 114) séquentiellement,
    * pour ne pas saturer la connexion ni la mémoire. Peut être annulé.
+   * S'arrête automatiquement à la limite gratuite si pas Premium.
    */
   const downloadAll = useCallback(async () => {
     if (!reciterIdentifier) return;
     setBulkRunning(true);
     setBulkCancelled(false);
     setError(null);
+    setLimitReachedNotice(false);
 
     for (let surahNumber = 1; surahNumber <= 114; surahNumber++) {
       if (bulkCancelled) break;
       const already = await isSurahDownloaded(reciterIdentifier, surahNumber);
       if (already) continue;
+
+      const currentCount = (await listDownloadedSurahs(reciterIdentifier)).length;
+      if (!isPremium && currentCount >= FREE_DOWNLOAD_LIMIT) {
+        setLimitReachedNotice(true);
+        break;
+      }
+
       try {
         const url = getSurahAudioUrl(surahNumber, reciterIdentifier);
         await downloadSurahAudio(url, reciterIdentifier, surahNumber, (received, total) => {
@@ -106,7 +127,7 @@ export function useAudioDownloads(reciterIdentifier) {
     }
 
     setBulkRunning(false);
-  }, [reciterIdentifier, bulkCancelled, refreshDownloadedList]);
+  }, [reciterIdentifier, bulkCancelled, refreshDownloadedList, isPremium]);
 
   const cancelBulkDownload = useCallback(() => setBulkCancelled(true), []);
 
@@ -121,6 +142,9 @@ export function useAudioDownloads(reciterIdentifier) {
     progress,
     bulkRunning,
     error,
+    hasReachedFreeLimit,
+    limitReachedNotice,
+    dismissLimitNotice: () => setLimitReachedNotice(false),
     downloadOne,
     removeOne,
     downloadAll,

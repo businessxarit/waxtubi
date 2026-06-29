@@ -376,6 +376,68 @@ Sans ces règles (mode "test" par défaut qui expire après 30 jours, ou règles
 trop restrictives), les sauvegardes du compteur échoueront silencieusement —
 l'app continuera de fonctionner en local, mais sans persistance cross-device.
 
+## Animation d'entrée enrichie (particules de lumière)
+
+Le splash screen affiche maintenant des particules de lumière qui
+montent doucement en arrière-plan (façon poussière d'étoiles), derrière
+l'arc gradué qui se dessine — toujours en CSS/SVG pur, aucune vidéo ni
+image externe. Désactivé automatiquement avec `prefers-reduced-motion`.
+
+Note sur la vidéo personnelle proposée : la vidéo envoyée n'a pas pu
+être intégrée car son origine exacte (montage avec texte coranique
+incrusté) n'était pas confirmée comme entièrement libre de droits —
+la scène filmée pouvait être personnelle, mais l'incrustation
+(calligraphie + effet) semblait provenir d'un template tiers. Une
+vidéo personnelle simple (sans template ni montage emprunté) pourra
+être ajoutée facilement par-dessus cette animation plus tard.
+
+## Abonnement Premium
+
+Système complet d'abonnement payant (mensuel/annuel), avec **Polar**
+comme Merchant of Record plutôt que Stripe directement — le Sénégal
+n'est pas dans la liste des pays où Stripe permet d'ouvrir un compte
+marchand, mais Polar facture les clients à sa place (basé aux USA) et
+reverse l'argent vers un compte bancaire sénégalais via Stripe Connect
+Express. Polar est lui-même construit par-dessus Stripe.
+
+### Ce qui est gratuit pour toujours
+Horaires de prière, Coran complet (lecture + audio en streaming illimité),
+Qibla, Dhikr, calendrier Hijri, Jours Blancs, suivi de jeûne/prière, Duas,
+Sira, calculateur de Zakat — tout le cœur religieux de l'app.
+
+### Ce qui est réservé à Premium
+- Téléchargement hors-ligne illimité (gratuit : limité à 10 sourates)
+- Sauvegarde cloud illimitée
+- Thèmes exclusifs, polices arabes supplémentaires
+- Mode Mushaf complet, statistiques détaillées
+- Toutes les tonalités de notification
+
+### Configuration requise avant mise en production
+
+1. **Créer un compte Polar** sur [polar.sh](https://polar.sh), configurer
+   l'organisation et créer deux produits (abonnement mensuel + annuel)
+2. Dans `src/pages/Premium.jsx`, remplacer `MONTHLY_CHECKOUT_BASE` et
+   `YEARLY_CHECKOUT_BASE` par les vrais liens de checkout Polar
+3. Dans le dashboard Polar → Webhooks, ajouter un endpoint vers
+   `https://waxtubi.vercel.app/api/polar-webhook`, écoutant les
+   événements `subscription.active`, `subscription.updated`,
+   `subscription.canceled`, `subscription.revoked`
+4. Sur Vercel → Environment Variables, ajouter :
+   - `POLAR_WEBHOOK_SECRET` (depuis le dashboard Polar)
+   - `FIREBASE_SERVICE_ACCOUNT_JSON` (clé de service Firebase Admin,
+     générée depuis Firebase Console → Paramètres du projet → Comptes
+     de service → Générer une nouvelle clé privée, JSON collé en une ligne)
+5. Vérifier que les règles Firestore protègent bien la collection
+   `subscription` en lecture seule côté client (le webhook écrit avec
+   les droits admin, qui contournent les règles — mais le client ne
+   doit jamais pouvoir écrire `active: true` lui-même)
+
+### Note de sécurité importante
+Le statut Premium n'est **jamais** calculé ou modifiable depuis le
+navigateur — uniquement écrit par le webhook serverless avec les
+droits Firebase Admin. Un utilisateur ne peut donc pas se l'attribuer
+en modifiant le code JS exécuté localement.
+
 ## Récitateurs audio (Coran)
 
 Chaque sourate peut être écoutée avec différents récitateurs (Alafasy, Sudais,

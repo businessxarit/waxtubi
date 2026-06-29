@@ -47,8 +47,34 @@ export default function SplashScreen({ onFinish }) {
     return { p1, p2, isMajor, delay: 0.4 + i * 0.018 };
   });
 
+  // Particules de lumière qui montent doucement en arrière-plan, façon
+  // poussière d'étoiles — position et timing variés pour un effet
+  // organique plutôt que mécanique.
+  const particles = Array.from({ length: 18 }, (_, i) => ({
+    left: 8 + ((i * 53) % 84),
+    size: 2 + (i % 3),
+    duration: 5 + (i % 5),
+    delay: -(i * 0.7),
+  }));
+
   return (
     <div className={`splash-screen ${leaving ? "is-leaving" : ""}`} role="status" aria-label="Chargement de Waxtubi">
+      <div className="splash-particles" aria-hidden="true">
+        {particles.map((p, i) => (
+          <span
+            key={i}
+            className="splash-particle"
+            style={{
+              left: `${p.left}%`,
+              width: p.size,
+              height: p.size,
+              animationDuration: `${p.duration}s`,
+              animationDelay: `${p.delay}s`,
+            }}
+          />
+        ))}
+      </div>
+
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="splash-svg">
         {ticks.map((t, i) => (
           <line
